@@ -3,8 +3,7 @@ name: Build Flutter APK
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,12 +22,23 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
-          channel: 'stable'
+          flutter-version: '3.x'
 
-      - name: Build APK
-        working-directory: ./flutter_mobile_app
+      - name: Find and Build APK
         run: |
+          echo "Searching for main.dart..."
+          MAIN_PATH=$(find . -name "main.dart" | head -n 1)
+          if [ -z "$MAIN_PATH" ]; then
+            echo "Error: main.dart not found anywhere!"
+            exit 1
+          fi
+          echo "Found main.dart at: $MAIN_PATH"
+          
+          # استخراج مجلد المشروع الرئيسي بناءً على موقع ملف main.dart
+          PROJECT_DIR=$(dirname $(dirname "$MAIN_PATH"))
+          echo "Project directory: $PROJECT_DIR"
+          
+          cd "$PROJECT_DIR"
           flutter pub get
           flutter build apk --release -t lib/main.dart
 
@@ -36,4 +46,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sym-app-apk
-          path: flutter_mobile_app/build/app/outputs/flutter-apk/app-release.apk
+          path: '**/build/app/outputs/flutter-apk/app-release.apk'
