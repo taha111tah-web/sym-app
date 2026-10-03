@@ -26,36 +26,32 @@ jobs:
 
       - name: Auto Find and Build
         run: |
-          echo "=== عرض هيكل الملفات والمجلدات ==="
-          find . -maxdepth 3 -not -path '*/.*' -not -path './build*'
-          
-          echo "=== البحث عن إعدادات المشروع ==="
+          echo "=== البحث الشامل عن ملفات المشروع ==="
           PUB_PATH=$(find . -name "pubspec.yaml" | head -n 1)
+          MAIN_PATH=$(find . -name "main.dart" | head -n 1)
+          
           if [ -z "$PUB_PATH" ]; then
             echo "Error: pubspec.yaml not found!"
+            exit 1
+          }
+          
+          if [ -z "$MAIN_PATH" ]; then
+            echo "Error: main.dart not found!"
             exit 1
           fi
           
           PROJ_DIR=$(dirname "$PUB_PATH")
+          # استخدام المسار المطلق لملف التشغيل لضمان عدم ضياعه نهائياً
+          ABS_MAIN_PATH=$(realpath "$MAIN_PATH")
+          
           echo "Found project at: $PROJ_DIR"
+          echo "Target main file absolute path: $ABS_MAIN_PATH"
           
           cd "$PROJ_DIR"
           flutter pub get
           
-          # البحث الذكي عن ملف التشغيل وبناء التطبيق
-          if [ -f "lib/main.dart" ]; then
-            echo "Building APK..."
-            flutter build apk --release
-          else
-            MAIN_FILE=$(find . -name "main.dart" | head -n 1)
-            if [ -n "$MAIN_FILE" ]; then
-              echo "Building using target: $MAIN_FILE"
-              flutter build apk --release -t "$MAIN_FILE"
-            else
-              echo "Error: main.dart not found in the project directory!"
-              exit 1
-            fi
-          fi
+          echo "Building APK..."
+          flutter build apk --release -t "$ABS_MAIN_PATH"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
