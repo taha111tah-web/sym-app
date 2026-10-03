@@ -24,33 +24,28 @@ jobs:
         with:
           flutter-version: '3.x'
 
-      - name: Auto Find and Build
+      - name: Build Flutter APK
         run: |
-          echo "=== البحث الشامل عن ملفات المشروع ==="
+          echo "=== البحث عن ملف pubspec.yaml ==="
           PUB_PATH=$(find . -name "pubspec.yaml" | head -n 1)
-          MAIN_PATH=$(find . -name "main.dart" | head -n 1)
           
           if [ -z "$PUB_PATH" ]; then
-            echo "Error: pubspec.yaml not found!"
-            exit 1
-          fi
-          
-          if [ -z "$MAIN_PATH" ]; then
-            echo "Error: main.dart not found!"
+            echo "Error: pubspec.yaml not found anywhere!"
             exit 1
           fi
           
           PROJ_DIR=$(dirname "$PUB_PATH")
-          ABS_MAIN_PATH=$(realpath "$MAIN_PATH")
-          
-          echo "Found project at: $PROJ_DIR"
-          echo "Target main file absolute path: $ABS_MAIN_PATH"
+          echo "Found project directory at: $PROJ_DIR"
           
           cd "$PROJ_DIR"
+          echo "Current directory contents:"
+          ls -la
+          
+          echo "Getting dependencies..."
           flutter pub get
           
-          echo "Building APK..."
-          flutter build apk --release -t "$ABS_MAIN_PATH"
+          echo "Building release APK..."
+          flutter build apk --release
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
