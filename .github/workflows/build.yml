@@ -25,8 +25,7 @@ jobs:
 
       - name: Build APK
         run: |
-          PROJECT_DIR=$(dirname $(find . -name "pubspec.yaml" -not -path "*/.*" | head -n 1))
-          cd "$PROJECT_DIR"
+          cd flutter_mobile_app
           flutter pub get
           flutter build apk --release
 
@@ -34,4 +33,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sym-app-apk
-          path: '**/build/app/outputs/flutter-apk/app-release.apk'
+          path: 'flutter_mobile_app/build/app/outputs/flutter-apk/app-release.apk'
