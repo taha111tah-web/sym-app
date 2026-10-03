@@ -26,7 +26,10 @@ jobs:
 
       - name: Auto Find and Build
         run: |
-          echo "Searching for project configuration..."
+          echo "=== عرض هيكل الملفات والمجلدات ==="
+          find . -maxdepth 3 -not -path '*/.*' -not -path './build*'
+          
+          echo "=== البحث عن إعدادات المشروع ==="
           PUB_PATH=$(find . -name "pubspec.yaml" | head -n 1)
           if [ -z "$PUB_PATH" ]; then
             echo "Error: pubspec.yaml not found!"
@@ -39,17 +42,17 @@ jobs:
           cd "$PROJ_DIR"
           flutter pub get
           
-          # البحث عن ملف التشغيل الأساسي وبنائه بدقة
+          # البحث الذكي عن ملف التشغيل وبناء التطبيق
           if [ -f "lib/main.dart" ]; then
             echo "Building APK..."
             flutter build apk --release
           else
-            MAIN_PATH=$(find . -name "main.dart" | head -n 1)
-            if [ -n "$MAIN_PATH" ]; then
-              echo "Building using target: $MAIN_PATH"
-              flutter build apk --release -t "$MAIN_PATH"
+            MAIN_FILE=$(find . -name "main.dart" | head -n 1)
+            if [ -n "$MAIN_FILE" ]; then
+              echo "Building using target: $MAIN_FILE"
+              flutter build apk --release -t "$MAIN_FILE"
             else
-              echo "Error: main.dart not found!"
+              echo "Error: main.dart not found in the project directory!"
               exit 1
             fi
           fi
