@@ -25,9 +25,8 @@ jobs:
 
       - name: Build APK
         run: |
-          if [ -d "flutter_mobile_app" ]; then
-            cd flutter_mobile_app
-          fi
+          PROJECT_DIR=$(dirname $(find . -name "pubspec.yaml" -not -path "*/.*" | head -n 1))
+          cd "$PROJECT_DIR"
           flutter pub get
           flutter build apk --release
 
