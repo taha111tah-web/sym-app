@@ -33,7 +33,7 @@ jobs:
           if [ -z "$PUB_PATH" ]; then
             echo "Error: pubspec.yaml not found!"
             exit 1
-          }
+          fi
           
           if [ -z "$MAIN_PATH" ]; then
             echo "Error: main.dart not found!"
@@ -41,7 +41,6 @@ jobs:
           fi
           
           PROJ_DIR=$(dirname "$PUB_PATH")
-          # استخدام المسار المطلق لملف التشغيل لضمان عدم ضياعه نهائياً
           ABS_MAIN_PATH=$(realpath "$MAIN_PATH")
           
           echo "Found project at: $PROJ_DIR"
