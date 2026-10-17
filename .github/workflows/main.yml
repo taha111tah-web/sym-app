@@ -2,7 +2,9 @@ name: Build Flutter APK
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -10,56 +12,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
+    - name: Set up Java 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x'
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
 
-      - name: Build Flutter APK
-        run: |
-          echo "=== البحث التلقائي عن ملف pubspec.yaml ==="
-          PUB_FILE=$(find . -name "pubspec.yaml" | head -n 1)
-          
-          if [ -z "$PUB_FILE" ]; then
-            echo "Error: pubspec.yaml not found anywhere!"
-            exit 1
-          fi
-          
-          PROJ_DIR=$(dirname "$PUB_FILE")
-          echo "تم العثور على مجلد المشروع في: $PROJ_DIR"
-          
-          cd "$PROJ_DIR"
-          
-          echo "محتويات مجلد المشروع:"
-          ls -la
-          
-          echo "جلب الحزم (pub get)..."
-          flutter pub get
-          
-          echo "بناء ملف الـ APK..."
-          if [ -f "lib/main.dart" ]; then
-            flutter build apk --release
-          else
-            MAIN_FILE=$(find . -name "main.dart" | head -n 1)
-            if [ -n "$MAIN_FILE" ]; then
-              flutter build apk --release --target="$MAIN_FILE"
-            else
-              echo "Error: main.dart not found!"
-              exit 1
-            fi
-          fi
+    - name: Install dependencies
+      run: flutter pub get
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: sym-app-apk
-          path: '**/build/app/outputs/flutter-apk/app-release.apk'
+    - name: Build APK
+      run: flutter build apk --release
+
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release
+        path: build/app/outputs/flutter-apk/app-release.apk
