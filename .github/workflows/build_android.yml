@@ -25,15 +25,27 @@ jobs:
           flutter-version: '3.x'
           channel: 'stable'
 
-      - name: Install Dependencies & Build APK
+      - name: Find and Build APK
         run: |
-          cd flutter_mobile_app
+          echo "Searching for main.dart file across the repository..."
+          MAIN_PATH=$(find . -name "main.dart" -not -path "*/.*" | head -n 1)
+          
+          if [ -z "$MAIN_PATH" ]; then
+            echo "Error: main.dart not found!"
+            exit 1
+          fi
+          
+          echo "Found main.dart at: $MAIN_PATH"
+          PROJECT_DIR=$(dirname $(dirname "$MAIN_PATH"))
+          echo "Project directory is: $PROJECT_DIR"
+          
+          cd "$PROJECT_DIR"
           flutter pub get
-          flutter build apk --release
+          flutter build apk --release -t "$(basename "$MAIN_PATH")"
         shell: bash
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: flutter_mobile_app/build/app/outputs/flutter-apk/app-release.apk
+          path: '**/build/app/outputs/flutter-apk/app-release.apk'
