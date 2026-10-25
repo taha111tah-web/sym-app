@@ -34,11 +34,15 @@ jobs:
           cd "$PROJECT_PATH"
           flutter pub get
           
-          # البحث التلقائي عن ملف التشغيل الرئيسي أينما وجد
-          MAIN_FILE=$(find . -name "main.dart" | head -n 1)
-          echo "Found main file at: $MAIN_FILE"
-          
-          flutter build apk --release -t "$MAIN_FILE"
+          # فحص مسار الملف الرئيسي وبنائه
+          if [ -f "lib/main.dart" ]; then
+            echo "Building using lib/main.dart"
+            flutter build apk --release -t lib/main.dart
+          else
+            MAIN_FILE=$(find . -name "main.dart" | head -n 1)
+            echo "Found main file at: $MAIN_FILE"
+            flutter build apk --release -t "$MAIN_FILE"
+          fi
         shell: bash
 
       - name: Upload APK Artifact
