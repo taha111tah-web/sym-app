@@ -30,7 +30,7 @@ jobs:
         working-directory: ./flutter_mobile_app
 
       - name: Build APK (Release)
-        run: flutter build apk --release
+        run: flutter build apk --release -t lib/main.dart
         working-directory: ./flutter_mobile_app
 
       - name: Upload APK Artifact
