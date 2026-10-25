@@ -25,23 +25,24 @@ jobs:
           flutter-version: '3.x'
           channel: 'stable'
 
-      - name: Find and Build APK
+      - name: Diagnostic and Build
         run: |
-          echo "Searching for main.dart file across the repository..."
-          MAIN_PATH=$(find . -name "main.dart" -not -path "*/.*" | head -n 1)
+          echo "=== 1. فحص محتويات المستودع الرئيسي ==="
+          ls -la
           
-          if [ -z "$MAIN_PATH" ]; then
-            echo "Error: main.dart not found!"
-            exit 1
-          fi
+          echo "=== 2. البحث عن مكان ملف الإعدادات pubspec.yaml ==="
+          find . -name "pubspec.yaml"
           
-          echo "Found main.dart at: $MAIN_PATH"
-          PROJECT_DIR=$(dirname $(dirname "$MAIN_PATH"))
-          echo "Project directory is: $PROJECT_DIR"
+          echo "=== 3. البحث عن مكان ملف التشغيل main.dart ==="
+          find . -name "main.dart"
+          
+          echo "=== 4. الانتقال تلقائياً وبدء البناء ==="
+          PROJECT_DIR=$(dirname $(find . -name "pubspec.yaml" | head -n 1))
+          echo "المجلد المحدد للبناء هو: $PROJECT_DIR"
           
           cd "$PROJECT_DIR"
           flutter pub get
-          flutter build apk --release -t "$(basename "$MAIN_PATH")"
+          flutter build apk --release
         shell: bash
 
       - name: Upload APK Artifact
