@@ -25,24 +25,13 @@ jobs:
           flutter-version: '3.x'
           channel: 'stable'
 
-      - name: Diagnostic and Build
+      - name: Check Project Structure
         run: |
-          echo "=== 1. فحص محتويات المستودع الرئيسي ==="
-          ls -la
+          echo "=== محتويات مجلد flutter_mobile_app ==="
+          ls -la flutter_mobile_app
           
-          echo "=== 2. البحث عن مكان ملف الإعدادات pubspec.yaml ==="
-          find . -name "pubspec.yaml"
-          
-          echo "=== 3. البحث عن مكان ملف التشغيل main.dart ==="
-          find . -name "main.dart"
-          
-          echo "=== 4. الانتقال تلقائياً وبدء البناء ==="
-          PROJECT_DIR=$(dirname $(find . -name "pubspec.yaml" | head -n 1))
-          echo "المجلد المحدد للبناء هو: $PROJECT_DIR"
-          
-          cd "$PROJECT_DIR"
-          flutter pub get
-          flutter build apk --release
+          echo "=== البحث عن أي ملفات برمجية (.dart) في المستودع ==="
+          find . -name "*.dart"
         shell: bash
 
       - name: Upload APK Artifact
