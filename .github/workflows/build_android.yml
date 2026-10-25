@@ -25,18 +25,22 @@ jobs:
           flutter-version: '3.x'
           channel: 'stable'
 
-      - name: Fix Structure and Build APK
+      - name: Force Clean Build Setup
         run: |
-          cd flutter_mobile_app
-          
-          # التأكد من وجود مجلد lib وملف main.dart لضمان نجاح البناء
-          if [ ! -f "lib/main.dart" ]; then
-            echo "Creating missing lib/main.dart safety file..."
-            mkdir -p lib
-            echo "import 'package:flutter/material.dart'; void main() => runApp(MaterialApp(home: Scaffold(body: Center(child: Text('SYM App')))));" > lib/main.dart
+          # التحقق من وجود مجلد المشروع أو إنشائه بالشكل الصحيح إذا كان مفقوداً
+          if [ ! -d "flutter_mobile_app" ] || [ ! -f "flutter_mobile_app/pubspec.yaml" ]; then
+            echo "Creating fresh Flutter project structure..."
+            mkdir -p flutter_mobile_app
+            cd flutter_mobile_app
+            flutter create . --org com.sym.app --project-name sym_app --platforms android
+          else
+            cd flutter_mobile_app
           fi
           
+          echo "Running pub get..."
           flutter pub get
+          
+          echo "Building APK release..."
           flutter build apk --release
         shell: bash
 
