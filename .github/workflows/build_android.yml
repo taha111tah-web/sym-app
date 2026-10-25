@@ -9,6 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: flutter_mobile_app
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -27,11 +31,9 @@ jobs:
 
       - name: Install Dependencies
         run: flutter pub get
-        working-directory: flutter_mobile_app
 
       - name: Build APK (Release)
         run: flutter build apk --release
-        working-directory: flutter_mobile_app
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
