@@ -25,21 +25,21 @@ jobs:
           flutter-version: '3.x'
           channel: 'stable'
 
-      - name: Create Structure and Build APK
+      - name: Fresh Create and Build APK
         run: |
-          # مسح أي مجلد قديم وإنشاء مشروع فلاتر جديد ونظيف بالكامل يضمن وجود lib/main.dart
+          # حذف المجلد القديم وإنشاء مشروع فلاتر نظيف ومتكامل يضمن وجود ملف التشغيل
           rm -rf flutter_mobile_app
           flutter create flutter_mobile_app --org com.sym.app --project-name sym_app --platforms android
           
           cd flutter_mobile_app
           
-          echo "Checking main.dart existence..."
+          echo "=== التحقق من وجود ملف التشغيل ==="
           ls -la lib/main.dart
           
-          echo "Running pub get..."
+          echo "=== جلب الحزم المطلوبة ==="
           flutter pub get
           
-          echo "Building APK..."
+          echo "=== بناء ملف الـ APK للإنتاج ==="
           flutter build apk --release
         shell: bash
 
