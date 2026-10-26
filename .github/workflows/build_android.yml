@@ -25,11 +25,14 @@ jobs:
           flutter-version: '3.x'
           channel: 'stable'
 
-      - name: Clean Init and Build APK
+      - name: Build Flutter APK
         run: |
-          # تنزيل أو إعادة تهيئة هيكل مشروع فلاتر نظيف بالكامل إذا كان المجلد فارغاً
-          rm -rf flutter_mobile_app
-          flutter create flutter_mobile_app --org com.sym.app --project-name sym_app --platforms android
+          # التحقق من وجود مجلد المشروع وملف الإعدادات، وإنشاؤه تلقائياً إن لم يكن موجوداً
+          if [ ! -d "flutter_mobile_app" ] || [ ! -f "flutter_mobile_app/pubspec.yaml" ]; then
+            echo "Creating fresh Flutter project structure..."
+            rm -rf flutter_mobile_app
+            flutter create flutter_mobile_app --org com.sym.app --project-name sym_app --platforms android
+          fi
           
           cd flutter_mobile_app
           
