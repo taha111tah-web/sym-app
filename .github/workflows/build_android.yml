@@ -25,21 +25,21 @@ jobs:
           flutter-version: '3.x'
           channel: 'stable'
 
-      - name: Build Flutter APK
+      - name: Create Structure and Build APK
         run: |
-          # التحقق من وجود مجلد المشروع وملف الإعدادات، وإنشاؤه تلقائياً إن لم يكن موجوداً
-          if [ ! -d "flutter_mobile_app" ] || [ ! -f "flutter_mobile_app/pubspec.yaml" ]; then
-            echo "Creating fresh Flutter project structure..."
-            rm -rf flutter_mobile_app
-            flutter create flutter_mobile_app --org com.sym.app --project-name sym_app --platforms android
-          fi
+          # مسح أي مجلد قديم وإنشاء مشروع فلاتر جديد ونظيف بالكامل يضمن وجود lib/main.dart
+          rm -rf flutter_mobile_app
+          flutter create flutter_mobile_app --org com.sym.app --project-name sym_app --platforms android
           
           cd flutter_mobile_app
+          
+          echo "Checking main.dart existence..."
+          ls -la lib/main.dart
           
           echo "Running pub get..."
           flutter pub get
           
-          echo "Building release APK..."
+          echo "Building APK..."
           flutter build apk --release
         shell: bash
 
