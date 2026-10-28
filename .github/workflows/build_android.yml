@@ -1,8 +1,8 @@
-name: Build APK
+name: Build Flutter APK
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -10,60 +10,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
+    - name: Set up Java Development Kit
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: '17'
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x'
-          channel: 'stable'
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: 'stable'
 
-      - name: Smart Build APK
-        run: |
-          echo "=== 1. البحث عن ملف الإعدادات pubspec.yaml ==="
-          PUBSPEC_PATH=$(find . -name "pubspec.yaml" | head -n 1)
-          
-          if [ -z "$PUBSPEC_PATH" ]; then
-            echo "Error: pubspec.yaml not found!"
-            exit 1
-          fi
-          
-          PROJECT_DIR=$(dirname "$PUBSPEC_PATH")
-          echo "Project directory is: $PROJECT_DIR"
-          
-          cd "$PROJECT_DIR"
-          
-          echo "=== 2. جلب حزم المشروع ==="
-          flutter pub get
-          
-          echo "=== 3. فحص وبناء ملف الـ APK ==="
-          if [ -f "lib/main.dart" ]; then
-            echo "Found lib/main.dart directly. Building..."
-            flutter build apk --release
-          else
-            echo "Searching for any main.dart file..."
-            MAIN_FILE=$(find . -name "main.dart" | head -n 1)
-            if [ -n "$MAIN_FILE" ]; then
-              echo "Found main.dart at: $MAIN_FILE"
-              flutter build apk --release -t "$MAIN_FILE"
-            else
-              echo "Creating a default safety main.dart to complete the build..."
-              mkdir -p lib
-              echo "import 'package:flutter/material.dart'; void main() => runApp(MaterialApp(home: Scaffold(body: Center(child: Text('sYm App')))));" > lib/main.dart
-              flutter build apk --release
-            fi
-          fi
-        shell: bash
+    - name: Get dependencies & Build APK
+      run: |
+        cd flutter_mobile_app
+        flutter pub get
+        flutter build apk --release
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-apk
-          path: '**/build/app/outputs/flutter-apk/app-release.apk'
+    - name: Upload APK Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: release-apk
+        path: flutter_mobile_app/build/app/outputs/flutter-apk/app-release.apk
